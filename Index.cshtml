@@ -1,0 +1,86 @@
+﻿@using LMS_MVC.Models
+@model CourseListing
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="course_list">
+        <h1>Welcome to The Tech Acacdemy LMS</h1>
+        <!-- 1 New code - Added progress bar, copied form DisplayCourse.cshtml-->
+        <div class="progress">
+            <div class="progress-bar" role="progressbar"
+                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                 style="width: 0%; min-width:100px">
+                0% Complete
+            </div>
+        </div>
+        <!-- 1 New code End-->
+        <p>Select from the following courses:</p>
+    </div>
+    <br />
+    <div class="course_icons">
+        <ul>
+            @foreach (var c in Model.CourseList)
+            {
+                <li>
+                    <h4><!-- 2 Added Checkboxes--><input type="checkbox" name="CB" onchange="CountCheckedBoxes(this)" /><!-- 2 Added Checkboxes End--> @Html.ActionLink(c.Title, "DisplayCourse", new { courseSelection = c.FileName })</h4>
+                </li>
+            }
+        </ul>
+    </div>
+
+
+</div>
+
+<!-- 3 Added script section-->
+<script type="text/javascript">
+    //Onload Function to retrieve states of checkboxes and Progress Bar from localStorage.
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var StoredValueList = JSON.parse(localStorage.getItem("ValueList")) || {};
+        for (i = 0; i < StoredValueList.length; i++) {
+            if (StoredValueList[i] == 1) {
+                document.querySelectorAll("input[type='checkbox']")[i].checked = true;
+            }
+        };
+
+        var StoredPBPct = JSON.parse(localStorage.getItem("PBPct"));
+        if (StoredPBPct == null) {
+            StoredPBPct = ["0%"];
+        }
+        $(".progress-bar").css("width", StoredPBPct);
+        $(".progress-bar").attr("aria-valuenow", StoredPBPct);
+        $(".progress-bar").text(StoredPBPct + " Complete");
+    }, false);
+
+    // Onclick Function to count checkboxes, set Progress Bar and save to localStorage.
+    function CountCheckedBoxes() {
+
+        var ValueList = [];
+        var CourseDays = [7, 1, 4, 3, 2, 7, 6, 13, 1, 18, 1, 10, 2];
+        var Count = 0;
+
+        $('input[type=checkbox]').each(function () {
+            var CBVal = (this.checked ? 1 : 0);
+            ValueList += (ValueList == [] ? CBVal : CBVal);
+            }
+        );
+
+        for (i = 0; i < ValueList.length; i++) {
+            if (ValueList[i] == 1) {
+                Count = Count + CourseDays[i];
+            }
+        }
+
+        PBPct = Math.floor((Count / 75) * 100).toString() + "%";
+        $(".progress-bar").css("width", PBPct);
+        $(".progress-bar").attr("aria-valuenow", PBPct);
+        $(".progress-bar").text(PBPct + " Complete");
+
+        localStorage.setItem("ValueList", JSON.stringify(ValueList));
+        localStorage.setItem("PBPct", JSON.stringify(PBPct));
+    }
+
+</script>
+<!-- 3 Added script section End-->
